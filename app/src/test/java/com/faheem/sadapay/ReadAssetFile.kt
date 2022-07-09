@@ -7,7 +7,7 @@ object ReadAssetFile {
     @Throws(IOException::class)
     fun readJsonFile(fileName: String): String {
         val br =
-            BufferedReader(InputStreamReader(FileInputStream("../yappk/src/main/assets/$fileName")))
+            BufferedReader(InputStreamReader(FileInputStream(fileName)))
         val sb = StringBuilder()
         var line: String? = br.readLine()
         while (line != null) {
