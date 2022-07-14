@@ -1,8 +1,8 @@
 package com.faheem.sadapay.data
 
+import com.faheem.sadapay.model.NetworkResult
 import com.faheem.sadapay.model.TrendingRepositories
-import retrofit2.Response
 
 interface TrendingRepositoriesProvider {
-    suspend fun fetchRepositories(): TrendingRepositories
+    suspend fun fetchRepositories(isUsingCache: Boolean = true): NetworkResult<TrendingRepositories>
 }
