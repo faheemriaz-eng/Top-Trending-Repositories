@@ -5,13 +5,15 @@ import com.faheem.sadapay.model.TrendingRepositories
 
 class GithubRepository constructor(
     private val githubService: GithubService,
-    private val localData: LocalData
+    private val localData: LocalDataSource
 ) : TrendingRepositoriesProvider, BaseRepository() {
 
     override suspend fun fetchRepositories(isUsingCache: Boolean): NetworkResult<TrendingRepositories> {
-        return if (isUsingCache)
-            localData.getCachedTrendingRepos()
-        else
+        return if (isUsingCache) {
+            localData.getCachedTrendingRepos()?.let {
+                NetworkResult.Success(it)
+            } ?: safeApiCall { githubService.loadTrendingRepositories() }
+        } else
             safeApiCall { githubService.loadTrendingRepositories() }
     }
 }

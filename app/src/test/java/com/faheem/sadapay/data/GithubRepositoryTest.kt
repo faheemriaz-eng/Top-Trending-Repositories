@@ -1,12 +1,9 @@
 package com.faheem.sadapay.data
 
-import android.content.Context
-import android.content.SharedPreferences
 import com.faheem.sadapay.CoroutineRule
 import com.faheem.sadapay.ReadAssetFile
 import com.faheem.sadapay.model.NetworkResult
 import com.faheem.sadapay.model.TrendingRepositories
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.mockk.coEvery
@@ -63,21 +60,39 @@ class GithubRepositoryTest {
     }
 
     @Test
-    fun `test fetch repositories from cache`() {
-        val mockContext = mockk<Context>()
+    fun `test fetch repositories from cache on second call`() {
+        val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
         val githubMockService = mockk<GithubService>()
+        val mockLocalData = mockk<LocalData>()
 
-        val sut = GithubRepository(githubMockService, LocalData(mockContext))
+        every { mockLocalData.getCachedTrendingRepos() } returns null
+        coEvery { githubMockService.loadTrendingRepositories() } returns mockResponse
 
-        val sharedPref = mockk<SharedPreferences>()
-        val mockTrendingRepo = Gson().toJson(readJsonFile("MockTrendingRepositories.json"))
-        every {mockContext.getSharedPreferences(SHARED_PREFERENCES_FILE_NAME,0) } returns sharedPref
-        every { sharedPref.getString(TRENDING_REPOSITORIES_KEY, null) } returns mockTrendingRepo
+        val sut = GithubRepository(githubMockService, mockLocalData)
+
 
         mainCoroutineRule.runBlockingTest {
-            val expectedResult = NetworkResult.Success(readJsonFile("MockTrendingRepositories.json"))
-            val actualResult = sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
-            Assert.assertEquals(expectedResult.data.items, actualResult.data.items)
+            val expectedResult =
+                NetworkResult.Success(readJsonFile("MockTrendingRepositories.json"))
+            val actualResultOnFirstCall =
+                sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
+
+            every { mockLocalData.getCachedTrendingRepos() } returns actualResultOnFirstCall.data
+
+            val actualResultOnSecondCall =
+                sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
+
+
+            Assert.assertEquals(
+                expectedResult.data.items,
+                actualResultOnFirstCall.data.items
+            )
+
+            Assert.assertEquals(
+                expectedResult.data.items,
+                actualResultOnSecondCall.data.items
+            )
+
         }
     }
 
