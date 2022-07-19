@@ -10,7 +10,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert
@@ -19,15 +19,16 @@ import org.junit.Test
 import retrofit2.Response
 
 
+@ExperimentalCoroutinesApi
 class GithubRepositoryTest {
 
     // Set the main coroutines dispatcher for unit testing.
-    @ExperimentalCoroutinesApi
-    @get:Rule
+    @Rule
+    @JvmField
     var mainCoroutineRule = CoroutineRule()
 
     @Test
-    fun `test fetch repositories from service`() {
+    fun `test fetch repositories from service`() = runTest {
         val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
         val githubMockService = mockk<GithubService>()
         val mockLocalData = mockk<LocalData>()
@@ -36,14 +37,12 @@ class GithubRepositoryTest {
 
         val sut = GithubRepository(githubMockService, mockLocalData)
 
-        mainCoroutineRule.runBlockingTest {
-            val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Success
-            Assert.assertEquals(actualRepositories.data.items, mockResponse.body()?.items)
-        }
+        val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Success
+        Assert.assertEquals(actualRepositories.data.items, mockResponse.body()?.items)
     }
 
     @Test
-    fun `test fetch repositories from service is failed with error code 400`() {
+    fun `test fetch repositories from service is failed with error code 400`() = runTest {
         val errorMessage = "This request unfortunately failed please try again"
         val mockErrorResponse = Response.error<TrendingRepositories>(
             400,
@@ -53,17 +52,16 @@ class GithubRepositoryTest {
         coEvery { githubMockService.loadTrendingRepositories() } returns mockErrorResponse
         val sut = GithubRepository(githubMockService, mockk())
 
-        mainCoroutineRule.runBlockingTest {
-            val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Error
-            Assert.assertEquals(
-                actualRepositories.error.message,
-                mockErrorResponse.errorBody()?.string()
-            )
-        }
+        val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Error
+        Assert.assertEquals(
+            actualRepositories.error.message,
+            mockErrorResponse.errorBody()?.string()
+        )
+
     }
 
     @Test
-    fun `test fetch repositories from cache on second call`() {
+    fun `test fetch repositories from cache on second call`() = runTest {
         val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
         val githubMockService = mockk<GithubService>()
         val mockLocalData = mockk<LocalData>()
@@ -75,29 +73,26 @@ class GithubRepositoryTest {
         val sut = GithubRepository(githubMockService, mockLocalData)
 
 
-        mainCoroutineRule.runBlockingTest {
-            val expectedResult =
-                NetworkResult.Success(readJsonFile("MockTrendingRepositories.json"))
-            val actualResultOnFirstCall =
-                sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
+        val expectedResult =
+            NetworkResult.Success(readJsonFile("MockTrendingRepositories.json"))
+        val actualResultOnFirstCall =
+            sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
 
-            every { mockLocalData.getCachedTrendingRepos() } returns actualResultOnFirstCall.data
+        every { mockLocalData.getCachedTrendingRepos() } returns actualResultOnFirstCall.data
 
-            val actualResultOnSecondCall =
-                sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
+        val actualResultOnSecondCall =
+            sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
 
 
-            Assert.assertEquals(
-                expectedResult.data.items,
-                actualResultOnFirstCall.data.items
-            )
+        Assert.assertEquals(
+            expectedResult.data.items,
+            actualResultOnFirstCall.data.items
+        )
 
-            Assert.assertEquals(
-                expectedResult.data.items,
-                actualResultOnSecondCall.data.items
-            )
-
-        }
+        Assert.assertEquals(
+            expectedResult.data.items,
+            actualResultOnSecondCall.data.items
+        )
     }
 
     private fun readJsonFile(fileName: String): TrendingRepositories {
