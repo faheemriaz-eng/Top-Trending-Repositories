@@ -1,6 +1,6 @@
-package com.faheem.sadapay
+package com.faheem.sadapay.data.dtos
 
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.utils.ReadAssetFile
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.junit.Assert

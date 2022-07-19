@@ -1,4 +1,4 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.utils
 
 
 const val SHARED_PREFERENCES_FILE_NAME = "sada_pay_task"

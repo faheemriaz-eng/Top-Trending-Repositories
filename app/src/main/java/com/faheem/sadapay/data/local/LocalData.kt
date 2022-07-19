@@ -1,8 +1,10 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.data.dtos.TrendingRepositories
+import com.faheem.sadapay.utils.SHARED_PREFERENCES_FILE_NAME
+import com.faheem.sadapay.utils.TRENDING_REPOSITORIES_KEY
 import com.google.gson.Gson
 import javax.inject.Inject
 

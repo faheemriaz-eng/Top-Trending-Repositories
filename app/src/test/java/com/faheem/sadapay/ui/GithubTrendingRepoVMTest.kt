@@ -1,10 +1,10 @@
 package com.faheem.sadapay.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.faheem.sadapay.CoroutineRule
-import com.faheem.sadapay.data.TrendingRepositoriesProvider
-import com.faheem.sadapay.model.Item
-import com.faheem.sadapay.model.NetworkResult
+import com.faheem.sadapay.data.dtos.Item
+import com.faheem.sadapay.data.remote.GithubDataSource
+import com.faheem.sadapay.data.remote.base.NetworkResult
+import com.faheem.sadapay.utils.CoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -26,7 +26,7 @@ class GithubTrendingRepoVMTest {
 
     @Test
     fun `test load trending repositories with success`() = runTest {
-        val mockGithubRepository = mockk<TrendingRepositoriesProvider> {
+        val mockGithubRepository = mockk<GithubDataSource> {
             coEvery { fetchRepositories() } returns NetworkResult.Success(
                 mockk { coEvery { items } returns listOf(Item()) })
         }
@@ -42,7 +42,7 @@ class GithubTrendingRepoVMTest {
 
     @Test
     fun `test load trending repositories with failure`() = runTest {
-        val mockGithubRepository = mockk<TrendingRepositoriesProvider> {
+        val mockGithubRepository = mockk<GithubDataSource> {
             coEvery { fetchRepositories() } returns NetworkResult.Error(
                 mockk { coEvery { message } returns "This request unfortunately failed please try again" })
         }
@@ -58,7 +58,7 @@ class GithubTrendingRepoVMTest {
 
     @Test
     fun `test load trending repositories with force refresh`() = runTest {
-        val mockGithubRepository = mockk<TrendingRepositoriesProvider> {
+        val mockGithubRepository = mockk<GithubDataSource> {
             coEvery { fetchRepositories(isUsingCache = false) } returns NetworkResult.Success(
                 mockk { coEvery { items } returns listOf(Item()) })
         }

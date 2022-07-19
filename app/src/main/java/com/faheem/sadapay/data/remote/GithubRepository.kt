@@ -1,13 +1,15 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.remote
 
-import com.faheem.sadapay.model.NetworkResult
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.data.dtos.TrendingRepositories
+import com.faheem.sadapay.data.local.LocalDataSource
+import com.faheem.sadapay.data.remote.base.BaseRepository
+import com.faheem.sadapay.data.remote.base.NetworkResult
 import javax.inject.Inject
 
 class GithubRepository @Inject constructor(
     private val githubService: GithubService,
     private val localData: LocalDataSource
-) : TrendingRepositoriesProvider, BaseRepository() {
+) : GithubDataSource, BaseRepository() {
 
     override suspend fun fetchRepositories(isUsingCache: Boolean): NetworkResult<TrendingRepositories> {
         return if (isUsingCache && null != localData.getCachedTrendingRepos()) {

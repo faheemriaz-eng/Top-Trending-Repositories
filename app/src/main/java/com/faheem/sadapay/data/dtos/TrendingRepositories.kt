@@ -1,4 +1,4 @@
-package com.faheem.sadapay.model
+package com.faheem.sadapay.data.dtos
 
 import com.google.gson.annotations.SerializedName
 

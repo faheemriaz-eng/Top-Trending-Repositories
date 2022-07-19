@@ -1,6 +1,6 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.local
 
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.data.dtos.TrendingRepositories
 
 interface LocalDataSource {
     fun getCachedTrendingRepos(): TrendingRepositories?

@@ -1,9 +1,9 @@
 package com.faheem.sadapay.di
 
 import android.content.Context
-import com.faheem.sadapay.data.GithubService
-import com.faheem.sadapay.data.LocalData
-import com.faheem.sadapay.data.LocalDataSource
+import com.faheem.sadapay.data.local.LocalData
+import com.faheem.sadapay.data.local.LocalDataSource
+import com.faheem.sadapay.data.remote.GithubService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

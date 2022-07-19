@@ -4,16 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.faheem.sadapay.data.TrendingRepositoriesProvider
-import com.faheem.sadapay.model.Item
-import com.faheem.sadapay.model.NetworkResult
+import com.faheem.sadapay.data.dtos.Item
+import com.faheem.sadapay.data.remote.GithubDataSource
+import com.faheem.sadapay.data.remote.base.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GithubTrendingRepoVM @Inject constructor(private val trendingRepositoriesProvider: TrendingRepositoriesProvider) :
+class GithubTrendingRepoVM @Inject constructor(private val trendingRepositoriesProvider: GithubDataSource) :
     ViewModel(), IGithubTrendingRepo {
     private val _trendingRepos: MutableLiveData<List<Item>> = MutableLiveData()
     override val trendingRepos: LiveData<List<Item>> = _trendingRepos

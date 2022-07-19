@@ -1,9 +1,10 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.remote
 
-import com.faheem.sadapay.CoroutineRule
-import com.faheem.sadapay.ReadAssetFile
-import com.faheem.sadapay.model.NetworkResult
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.data.dtos.TrendingRepositories
+import com.faheem.sadapay.data.local.LocalData
+import com.faheem.sadapay.data.remote.base.NetworkResult
+import com.faheem.sadapay.utils.CoroutineRule
+import com.faheem.sadapay.utils.ReadAssetFile
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.mockk.coEvery

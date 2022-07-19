@@ -1,7 +1,7 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.remote
 
 import androidx.viewbinding.BuildConfig
-import com.faheem.sadapay.model.TrendingRepositories
+import com.faheem.sadapay.data.dtos.TrendingRepositories
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response

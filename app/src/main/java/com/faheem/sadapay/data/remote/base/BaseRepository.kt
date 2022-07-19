@@ -1,6 +1,5 @@
-package com.faheem.sadapay.data
+package com.faheem.sadapay.data.remote.base
 
-import com.faheem.sadapay.model.NetworkResult
 import okio.IOException
 import retrofit2.Response
 
