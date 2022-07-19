@@ -9,11 +9,14 @@ class GithubRepository constructor(
 ) : TrendingRepositoriesProvider, BaseRepository() {
 
     override suspend fun fetchRepositories(isUsingCache: Boolean): NetworkResult<TrendingRepositories> {
-        return if (isUsingCache) {
-            localData.getCachedTrendingRepos()?.let {
-                NetworkResult.Success(it)
-            } ?: safeApiCall { githubService.loadTrendingRepositories() }
-        } else
-            safeApiCall { githubService.loadTrendingRepositories() }
+        return if (isUsingCache && null != localData.getCachedTrendingRepos()) {
+            NetworkResult.Success(localData.getCachedTrendingRepos()!!)
+        } else {
+            val response = safeApiCall { githubService.loadTrendingRepositories() }
+            if (response is NetworkResult.Success)
+                localData.saveTrendingRepositories(response.data)
+
+            return response
+        }
     }
 }

@@ -30,8 +30,11 @@ class GithubRepositoryTest {
     fun `test fetch repositories from service`() {
         val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
         val githubMockService = mockk<GithubService>()
+        val mockLocalData = mockk<LocalData>()
+        every { mockLocalData.saveTrendingRepositories(mockResponse.body()!!) } returns true
         coEvery { githubMockService.loadTrendingRepositories() } returns mockResponse
-        val sut = GithubRepository(githubMockService, mockk())
+
+        val sut = GithubRepository(githubMockService, mockLocalData)
 
         mainCoroutineRule.runBlockingTest {
             val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Success
@@ -66,6 +69,7 @@ class GithubRepositoryTest {
         val mockLocalData = mockk<LocalData>()
 
         every { mockLocalData.getCachedTrendingRepos() } returns null
+        every { mockLocalData.saveTrendingRepositories(mockResponse.body()!!) } returns true
         coEvery { githubMockService.loadTrendingRepositories() } returns mockResponse
 
         val sut = GithubRepository(githubMockService, mockLocalData)
