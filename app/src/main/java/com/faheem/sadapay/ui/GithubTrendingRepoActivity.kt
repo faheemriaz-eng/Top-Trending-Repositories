@@ -3,7 +3,8 @@ package com.faheem.sadapay.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.faheem.sadapay.R
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class GithubTrendingRepoActivity : AppCompatActivity() {
 
-    lateinit var mViewBinding: ActivityGithubTrendingReposBinding
+    private lateinit var mViewBinding: ActivityGithubTrendingReposBinding
 
     private val viewModel: GithubTrendingRepoVM by viewModels()
 
@@ -32,20 +33,39 @@ class GithubTrendingRepoActivity : AppCompatActivity() {
     }
 
     private fun bindViewState(viewState: GithubTrendingRepoVM.ViewState) {
+        hideLoadingView()
         when (viewState) {
             is GithubTrendingRepoVM.ViewState.Loading -> {
+                showLoadingView()
             }
             is GithubTrendingRepoVM.ViewState.ReposLoaded -> {
-                mViewBinding.lyRetryView.layoutError.visibility = View.GONE
-                mViewBinding.recyclerView.visibility = View.VISIBLE
-                adapter.setList(viewState.repos ?: listOf())
+                if (!(viewState.repos.isNullOrEmpty())) {
+                    adapter.setList(viewState.repos)
+                    showDataView(true)
+                } else {
+                    showDataView(false)
+                }
             }
 
             is GithubTrendingRepoVM.ViewState.ReposLoadFailure -> {
-                mViewBinding.recyclerView.visibility = View.GONE
-                mViewBinding.lyRetryView.layoutError.visibility = View.VISIBLE
+                showDataView(false)
             }
         }
+    }
+
+    private fun showLoadingView() {
+        mViewBinding.lyLoadingView.shimmerFrameLayout.visibility = VISIBLE
+        mViewBinding.recyclerView.visibility = GONE
+        mViewBinding.lyRetryView.layoutError.visibility = GONE
+    }
+
+    private fun showDataView(show: Boolean) {
+        mViewBinding.lyRetryView.layoutError.visibility = if (show) GONE else VISIBLE
+        mViewBinding.recyclerView.visibility = if (show) VISIBLE else GONE
+    }
+
+    private fun hideLoadingView() {
+        mViewBinding.lyLoadingView.shimmerFrameLayout.visibility = GONE
     }
 
     private fun addObservers() {
