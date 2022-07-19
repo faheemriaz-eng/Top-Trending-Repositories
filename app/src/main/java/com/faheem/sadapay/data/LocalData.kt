@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.faheem.sadapay.model.TrendingRepositories
 import com.google.gson.Gson
+import javax.inject.Inject
 
-class LocalData(private val context: Context) : LocalDataSource {
+class LocalData @Inject constructor(private val context: Context) : LocalDataSource {
 
     override fun getCachedTrendingRepos(): TrendingRepositories? {
         val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, 0)

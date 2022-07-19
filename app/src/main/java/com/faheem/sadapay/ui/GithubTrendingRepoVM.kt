@@ -7,10 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.faheem.sadapay.data.TrendingRepositoriesProvider
 import com.faheem.sadapay.model.Item
 import com.faheem.sadapay.model.NetworkResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GithubTrendingRepoVM(private val trendingRepositoriesProvider: TrendingRepositoriesProvider) :
+@HiltViewModel
+class GithubTrendingRepoVM @Inject constructor(private val trendingRepositoriesProvider: TrendingRepositoriesProvider) :
     ViewModel(), IGithubTrendingRepo {
     private val _trendingRepos: MutableLiveData<List<Item>> = MutableLiveData()
     override val trendingRepos: LiveData<List<Item>> = _trendingRepos
@@ -19,10 +22,11 @@ class GithubTrendingRepoVM(private val trendingRepositoriesProvider: TrendingRep
         viewModelScope.launch(Dispatchers.IO) {
             when (val response = trendingRepositoriesProvider.fetchRepositories(!refresh)) {
                 is NetworkResult.Success -> {
-                    _trendingRepos.value = response.data.items
+                    _trendingRepos.postValue(response.data.items)
                 }
                 is NetworkResult.Error -> {
                     _trendingRepos.value = listOf()
+                    _trendingRepos.postValue(listOf())
                 }
             }
         }

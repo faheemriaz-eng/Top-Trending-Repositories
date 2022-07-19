@@ -1,5 +1,6 @@
 package com.faheem.sadapay.data
 
+import androidx.viewbinding.BuildConfig
 import com.faheem.sadapay.model.TrendingRepositories
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,12 +18,14 @@ interface GithubService {
         private const val BASE_URL = "https://api.github.com/"
 
         fun create(): GithubService {
-            val logger = HttpLoggingInterceptor()
-            logger.level = HttpLoggingInterceptor.Level.BASIC
-
+            val loggingInterceptor = HttpLoggingInterceptor()
+            if (BuildConfig.DEBUG) {
+                loggingInterceptor.apply { level = HttpLoggingInterceptor.Level.BODY }
+            }
             val client = OkHttpClient.Builder()
-                .addInterceptor(logger)
+                .addInterceptor(loggingInterceptor)
                 .build()
+
             return Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(client)

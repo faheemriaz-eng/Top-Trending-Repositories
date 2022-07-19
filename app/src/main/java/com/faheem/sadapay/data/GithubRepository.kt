@@ -2,8 +2,9 @@ package com.faheem.sadapay.data
 
 import com.faheem.sadapay.model.NetworkResult
 import com.faheem.sadapay.model.TrendingRepositories
+import javax.inject.Inject
 
-class GithubRepository constructor(
+class GithubRepository @Inject constructor(
     private val githubService: GithubService,
     private val localData: LocalDataSource
 ) : TrendingRepositoriesProvider, BaseRepository() {
