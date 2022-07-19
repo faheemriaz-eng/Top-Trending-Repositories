@@ -15,9 +15,9 @@ class GithubTrendingRepoVM(private val trendingRepositoriesProvider: TrendingRep
     private val _trendingRepos: MutableLiveData<List<Item>> = MutableLiveData()
     override val trendingRepos: LiveData<List<Item>> = _trendingRepos
 
-    override fun loadTrendingRepositories() {
+    override fun loadTrendingRepositories(refresh: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val response = trendingRepositoriesProvider.fetchRepositories()) {
+            when (val response = trendingRepositoriesProvider.fetchRepositories(!refresh)) {
                 is NetworkResult.Success -> {
                     _trendingRepos.value = response.data.items
                 }

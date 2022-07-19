@@ -5,5 +5,5 @@ import com.faheem.sadapay.model.Item
 
 interface IGithubTrendingRepo {
     val trendingRepos: LiveData<List<Item>>
-    fun loadTrendingRepositories()
+    fun loadTrendingRepositories(refresh: Boolean = false)
 }

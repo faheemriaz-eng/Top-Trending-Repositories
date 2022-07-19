@@ -55,4 +55,20 @@ class GithubTrendingRepoVMTest {
             mockGithubRepository.fetchRepositories()
         }
     }
+
+    @Test
+    fun `test load trending repositories with force refresh`() = runTest {
+        val mockGithubRepository = mockk<TrendingRepositoriesProvider> {
+            coEvery { fetchRepositories(isUsingCache = false) } returns NetworkResult.Success(
+                mockk { coEvery { items } returns listOf(Item()) })
+        }
+        val sut = GithubTrendingRepoVM(mockGithubRepository)
+        sut.loadTrendingRepositories(refresh = true)
+
+        Assert.assertEquals(listOf(Item()), sut.trendingRepos.getOrAwaitValue())
+
+        coVerify {
+            mockGithubRepository.fetchRepositories(isUsingCache = false)
+        }
+    }
 }
