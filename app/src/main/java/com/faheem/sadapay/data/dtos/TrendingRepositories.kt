@@ -13,6 +13,8 @@ data class TrendingRepositories(
 )
 
 data class Item(
+    @SerializedName("name")
+    var name: String? = null,
     @SerializedName("full_name")
     val fullName: String? = null,
     @SerializedName("description")

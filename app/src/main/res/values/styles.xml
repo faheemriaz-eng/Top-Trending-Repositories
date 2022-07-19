@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="shapeAppearance.App.CircleImageView.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="App.TextView.Black" parent="Widget.MaterialComponents.TextView">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="App.TextView.Grey" parent="Widget.MaterialComponents.TextView">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="App.TextView.Black.Bold" parent="App.TextView.Black">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>
