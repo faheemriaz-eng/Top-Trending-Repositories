@@ -22,6 +22,7 @@ class GithubTrendingRepoVM(private val trendingRepositoriesProvider: TrendingRep
                     _trendingRepos.value = response.data.items
                 }
                 is NetworkResult.Error -> {
+                    _trendingRepos.value = listOf()
                 }
             }
         }

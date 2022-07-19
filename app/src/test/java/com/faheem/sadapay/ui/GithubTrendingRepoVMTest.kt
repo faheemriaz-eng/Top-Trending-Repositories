@@ -39,4 +39,20 @@ class GithubTrendingRepoVMTest {
             mockGithubRepository.fetchRepositories()
         }
     }
+
+    @Test
+    fun `test load trending repositories with failure`() = runTest {
+        val mockGithubRepository = mockk<TrendingRepositoriesProvider> {
+            coEvery { fetchRepositories() } returns NetworkResult.Error(
+                mockk { coEvery { message } returns "This request unfortunately failed please try again" })
+        }
+        val sut = GithubTrendingRepoVM(mockGithubRepository)
+        sut.loadTrendingRepositories()
+
+        Assert.assertEquals(listOf<Item>(), sut.trendingRepos.getOrAwaitValue())
+
+        coVerify {
+            mockGithubRepository.fetchRepositories()
+        }
+    }
 }
