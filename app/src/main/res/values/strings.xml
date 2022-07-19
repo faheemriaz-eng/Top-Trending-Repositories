@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="refresh">Refresh</string>
+    <string name="error_message">Something went wrong</string>
+    <string name="error_message_detail">An alien is probably blocking your signal</string>
+    <string name="retry_button_title">Retry</string>
+
 </resources>

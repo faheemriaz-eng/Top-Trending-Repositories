@@ -3,10 +3,10 @@ package com.faheem.sadapay.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.faheem.sadapay.R
-import com.faheem.sadapay.data.dtos.Item
 import com.faheem.sadapay.databinding.ActivityGithubTrendingReposBinding
 import com.faheem.sadapay.ui.adapter.GithubTrendingReposAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,20 +26,30 @@ class GithubTrendingRepoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mViewBinding = ActivityGithubTrendingReposBinding.inflate(layoutInflater)
         setContentView(mViewBinding.root)
+
         mViewBinding.recyclerView.adapter = adapter
         addObservers()
-        viewModel.loadTrendingRepositories()
     }
 
-    private fun bindListData(repos: List<Item>) {
-        if (!(repos.isNullOrEmpty())) {
-            adapter.setList(repos)
-        } else {
+    private fun bindViewState(viewState: GithubTrendingRepoVM.ViewState) {
+        when (viewState) {
+            is GithubTrendingRepoVM.ViewState.Loading -> {
+            }
+            is GithubTrendingRepoVM.ViewState.ReposLoaded -> {
+                mViewBinding.lyRetryView.layoutError.visibility = View.GONE
+                mViewBinding.recyclerView.visibility = View.VISIBLE
+                adapter.setList(viewState.repos ?: listOf())
+            }
+
+            is GithubTrendingRepoVM.ViewState.ReposLoadFailure -> {
+                mViewBinding.recyclerView.visibility = View.GONE
+                mViewBinding.lyRetryView.layoutError.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun addObservers() {
-        viewModel.trendingRepos.observe(this, ::bindListData)
+        viewModel.viewState.observe(this, ::bindViewState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

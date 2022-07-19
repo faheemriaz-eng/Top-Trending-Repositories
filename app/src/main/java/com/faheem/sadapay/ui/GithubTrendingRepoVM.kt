@@ -18,17 +18,32 @@ class GithubTrendingRepoVM @Inject constructor(private val trendingRepositoriesP
     private val _trendingRepos: MutableLiveData<List<Item>> = MutableLiveData()
     override val trendingRepos: LiveData<List<Item>> = _trendingRepos
 
+    private val _viewState = MutableLiveData<ViewState>()
+    override val viewState: LiveData<ViewState> = _viewState
+
+    init {
+        loadTrendingRepositories()
+    }
+
     override fun loadTrendingRepositories(refresh: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
+            _viewState.postValue(ViewState.Loading)
             when (val response = trendingRepositoriesProvider.fetchRepositories(!refresh)) {
                 is NetworkResult.Success -> {
+                    _viewState.postValue(ViewState.ReposLoaded(response.data.items))
                     _trendingRepos.postValue(response.data.items)
                 }
                 is NetworkResult.Error -> {
-                    _trendingRepos.value = listOf()
+                    _viewState.postValue(ViewState.ReposLoadFailure(response.error.message ?: ""))
                     _trendingRepos.postValue(listOf())
                 }
             }
         }
+    }
+
+    sealed class ViewState {
+        object Loading : ViewState()
+        data class ReposLoaded(val repos: List<Item>?) : ViewState()
+        data class ReposLoadFailure(val errorMessage: String) : ViewState()
     }
 }
