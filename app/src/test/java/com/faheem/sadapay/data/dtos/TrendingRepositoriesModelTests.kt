@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import org.junit.Assert
 import org.junit.Test
 
-class TrendingModelTests {
+class TrendingRepositoriesModelTests {
 
     @Test
     fun `test json response maps to model`() {

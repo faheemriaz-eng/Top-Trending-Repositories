@@ -1,7 +1,11 @@
 package com.faheem.sadapay.di
 
-import com.faheem.sadapay.data.remote.GithubDataSource
-import com.faheem.sadapay.data.remote.GithubRepository
+import com.faheem.sadapay.data.GithubDataRepository
+import com.faheem.sadapay.data.GithubDataRepositorySource
+import com.faheem.sadapay.data.local.LocalData
+import com.faheem.sadapay.data.local.LocalDataSource
+import com.faheem.sadapay.data.remote.RemoteDataSource
+import com.faheem.sadapay.data.remote.RemoteRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,5 +17,13 @@ import javax.inject.Singleton
 abstract class DataModule {
     @Binds
     @Singleton
-    abstract fun provideGithubRepository(githubRepository: GithubRepository): GithubDataSource
+    abstract fun provideRemoteRepository(githubRepository: RemoteRepository): RemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun providesLocalData(localData: LocalData): LocalDataSource
+
+    @Binds
+    @Singleton
+    abstract fun provideGithubDataRepository(githubDataRepository: GithubDataRepository): GithubDataRepositorySource
 }

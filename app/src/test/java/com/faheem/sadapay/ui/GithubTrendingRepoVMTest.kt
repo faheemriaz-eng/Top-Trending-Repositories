@@ -1,8 +1,8 @@
 package com.faheem.sadapay.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.faheem.sadapay.data.GithubDataRepositorySource
 import com.faheem.sadapay.data.dtos.Item
-import com.faheem.sadapay.data.remote.GithubDataSource
 import com.faheem.sadapay.data.remote.base.NetworkResult
 import com.faheem.sadapay.utils.CoroutineRule
 import io.mockk.coEvery
@@ -24,51 +24,53 @@ class GithubTrendingRepoVMTest {
     @JvmField
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    lateinit var sut: GithubTrendingRepoVM
+
     @Test
     fun `test load trending repositories with success`() = runTest {
-        val mockGithubRepository = mockk<GithubDataSource> {
-            coEvery { fetchRepositories() } returns NetworkResult.Success(
+        val mockGithubRepository = mockk<GithubDataRepositorySource> {
+            coEvery { loadTrendingRepositories() } returns NetworkResult.Success(
                 mockk { coEvery { items } returns listOf(Item()) })
         }
-        val sut = GithubTrendingRepoVM(mockGithubRepository)
+        sut = GithubTrendingRepoVM(mockGithubRepository)
         sut.loadTrendingRepositories()
 
         Assert.assertEquals(listOf(Item()), sut.trendingRepos.getOrAwaitValue())
 
         coVerify {
-            mockGithubRepository.fetchRepositories()
+            mockGithubRepository.loadTrendingRepositories()
         }
     }
 
     @Test
     fun `test load trending repositories with failure`() = runTest {
-        val mockGithubRepository = mockk<GithubDataSource> {
-            coEvery { fetchRepositories() } returns NetworkResult.Error(
+        val mockGithubRepository = mockk<GithubDataRepositorySource> {
+            coEvery { loadTrendingRepositories() } returns NetworkResult.Error(
                 mockk { coEvery { message } returns "This request unfortunately failed please try again" })
         }
-        val sut = GithubTrendingRepoVM(mockGithubRepository)
+        sut = GithubTrendingRepoVM(mockGithubRepository)
         sut.loadTrendingRepositories()
 
         Assert.assertEquals(listOf<Item>(), sut.trendingRepos.getOrAwaitValue())
 
         coVerify {
-            mockGithubRepository.fetchRepositories()
+            mockGithubRepository.loadTrendingRepositories()
         }
     }
 
     @Test
     fun `test load trending repositories with force refresh`() = runTest {
-        val mockGithubRepository = mockk<GithubDataSource> {
-            coEvery { fetchRepositories(isUsingCache = false) } returns NetworkResult.Success(
+        val mockGithubRepository = mockk<GithubDataRepositorySource> {
+            coEvery { loadTrendingRepositories(isUsingCache = false) } returns NetworkResult.Success(
                 mockk { coEvery { items } returns listOf(Item()) })
         }
-        val sut = GithubTrendingRepoVM(mockGithubRepository)
+        sut = GithubTrendingRepoVM(mockGithubRepository)
         sut.loadTrendingRepositories(refresh = true)
 
         Assert.assertEquals(listOf(Item()), sut.trendingRepos.getOrAwaitValue())
 
         coVerify {
-            mockGithubRepository.fetchRepositories(isUsingCache = false)
+            mockGithubRepository.loadTrendingRepositories(isUsingCache = false)
         }
     }
 }

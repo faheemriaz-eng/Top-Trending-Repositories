@@ -24,10 +24,7 @@ class GithubTrendingReposViewHolder(private val itemBinding: LayoutItemGithubTre
             tvOwnerName.text = item.name
             tvRepoName.text = item.fullName
             tvDetails.text = item.description
-            tvTopicName.text = item.language?.let {
-                it
-            } ?: item.name
-
+            tvTopicName.text = item.language ?: item.name
             tvStarCount.text = item.stargazersCount?.toString()
 
             Glide.with(ivProfile.context)

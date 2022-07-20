@@ -1,14 +1,13 @@
 package com.faheem.sadapay.data.remote
 
 import com.faheem.sadapay.data.dtos.TrendingRepositories
-import com.faheem.sadapay.data.local.LocalData
 import com.faheem.sadapay.data.remote.base.NetworkResult
 import com.faheem.sadapay.utils.CoroutineRule
 import com.faheem.sadapay.utils.ReadAssetFile
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -23,23 +22,26 @@ import retrofit2.Response
 @ExperimentalCoroutinesApi
 class GithubRepositoryTest {
 
-    // Set the main coroutines dispatcher for unit testing.
     @Rule
     @JvmField
     var mainCoroutineRule = CoroutineRule()
+
+    lateinit var sut: RemoteDataSource
 
     @Test
     fun `test fetch repositories from service`() = runTest {
         val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
         val githubMockService = mockk<GithubService>()
-        val mockLocalData = mockk<LocalData>()
-        every { mockLocalData.saveTrendingRepositories(mockResponse.body()!!) } returns true
         coEvery { githubMockService.loadTrendingRepositories() } returns mockResponse
 
-        val sut = GithubRepository(githubMockService, mockLocalData)
+        sut = RemoteRepository(githubMockService)
 
-        val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Success
+        val actualRepositories = sut.fetchRepositories() as NetworkResult.Success
         Assert.assertEquals(actualRepositories.data.items, mockResponse.body()?.items)
+
+        coVerify {
+            githubMockService.loadTrendingRepositories()
+        }
     }
 
     @Test
@@ -51,49 +53,18 @@ class GithubRepositoryTest {
         )
         val githubMockService = mockk<GithubService>()
         coEvery { githubMockService.loadTrendingRepositories() } returns mockErrorResponse
-        val sut = GithubRepository(githubMockService, mockk())
 
-        val actualRepositories = sut.fetchRepositories(false) as NetworkResult.Error
+        sut = RemoteRepository(githubMockService)
+
+        val actualRepositories = sut.fetchRepositories() as NetworkResult.Error
         Assert.assertEquals(
             actualRepositories.error.message,
             mockErrorResponse.errorBody()?.string()
         )
 
-    }
-
-    @Test
-    fun `test fetch repositories from cache on second call`() = runTest {
-        val mockResponse = Response.success(readJsonFile("MockTrendingRepositories.json"))
-        val githubMockService = mockk<GithubService>()
-        val mockLocalData = mockk<LocalData>()
-
-        every { mockLocalData.getCachedTrendingRepos() } returns null
-        every { mockLocalData.saveTrendingRepositories(mockResponse.body()!!) } returns true
-        coEvery { githubMockService.loadTrendingRepositories() } returns mockResponse
-
-        val sut = GithubRepository(githubMockService, mockLocalData)
-
-
-        val expectedResult =
-            NetworkResult.Success(readJsonFile("MockTrendingRepositories.json"))
-        val actualResultOnFirstCall =
-            sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
-
-        every { mockLocalData.getCachedTrendingRepos() } returns actualResultOnFirstCall.data
-
-        val actualResultOnSecondCall =
-            sut.fetchRepositories(isUsingCache = true) as NetworkResult.Success
-
-
-        Assert.assertEquals(
-            expectedResult.data.items,
-            actualResultOnFirstCall.data.items
-        )
-
-        Assert.assertEquals(
-            expectedResult.data.items,
-            actualResultOnSecondCall.data.items
-        )
+        coVerify {
+            githubMockService.loadTrendingRepositories()
+        }
     }
 
     private fun readJsonFile(fileName: String): TrendingRepositories {

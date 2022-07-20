@@ -6,9 +6,11 @@ import com.faheem.sadapay.data.dtos.TrendingRepositories
 import com.faheem.sadapay.utils.SHARED_PREFERENCES_FILE_NAME
 import com.faheem.sadapay.utils.TRENDING_REPOSITORIES_KEY
 import com.google.gson.Gson
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class LocalData @Inject constructor(private val context: Context) : LocalDataSource {
+class LocalData @Inject constructor(@ApplicationContext private val context: Context) :
+    LocalDataSource {
 
     override fun getCachedTrendingRepos(): TrendingRepositories? {
         val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, 0)
