@@ -18,7 +18,7 @@ class GithubTrendingRepoActivity : AppCompatActivity() {
 
     private lateinit var mViewBinding: ActivityGithubTrendingReposBinding
 
-    private val viewModel: GithubTrendingRepoVM by viewModels()
+    private val viewModel: IGithubTrendingRepo by viewModels<GithubTrendingRepoVM>()
 
     @Inject
     lateinit var adapter: GithubTrendingReposAdapter
@@ -27,17 +27,30 @@ class GithubTrendingRepoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mViewBinding = ActivityGithubTrendingReposBinding.inflate(layoutInflater)
         setContentView(mViewBinding.root)
-
-        mViewBinding.recyclerView.adapter = adapter
+        initViews()
         addObservers()
+    }
+
+    private fun initViews() {
+        initClickListeners()
+        initRecyclerView()
+    }
+
+    private fun initRecyclerView() {
+        mViewBinding.recyclerView.adapter = adapter
+    }
+
+    private fun initClickListeners() {
+        mViewBinding.lyRetryView.buttonRetry.setOnClickListener {
+            viewModel.loadTrendingRepositories(true)
+        }
     }
 
     private fun bindViewState(viewState: GithubTrendingRepoVM.ViewState) {
         hideLoadingView()
         when (viewState) {
-            is GithubTrendingRepoVM.ViewState.Loading -> {
-                showLoadingView()
-            }
+            is GithubTrendingRepoVM.ViewState.Loading -> showLoadingView()
+
             is GithubTrendingRepoVM.ViewState.ReposLoaded -> {
                 if (!(viewState.repos.isNullOrEmpty())) {
                     adapter.setList(viewState.repos)
